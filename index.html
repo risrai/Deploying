@@ -1,154 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>For You</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin Wheel Game</title>
 
-    <style>
-       .game-container {
-    text-align: center;
-}
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        text-align: center;
+        overflow-x: hidden;
+    }
 
-.wheel {
-    width: 200px;
-    height: 200px;
-    border: 10px solid #333;
-    border-radius: 50%;
-    margin: 20px auto;
-    background: conic-gradient(
-        #ff4d4d 0 60deg,
-        #4dff4d 60deg 120deg,
-        #4d4dff 120deg 180deg,
-        #ffcc00 180deg 240deg,
-        #ff66cc 240deg 300deg,
-        #66ffff 300deg 360deg
-    );
-    transition: transform 3s ease-out;
-}
+    .wheel-container {
+        margin-top: 20px;
+    }
 
-.hidden {
-    display: none;
-}
+    #wheel {
+        width: 260px;
+        height: 260px;
+        transition: transform 3s cubic-bezier(.17,.67,.32,1);
+    }
 
-.result-img {
-    width: 150px;
-    margin-top: 10px;
-}
+    /* Fullscreen responsive result image */
+    #resultImage {
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        object-fit: contain;
+        margin-top: 20px;
+        display: none;
+    }
 
-    </style>
+    #spinBtn {
+        margin-top: 20px;
+        padding: 12px 28px;
+        background: #e75480;
+        color: white;
+        border: none;
+        font-size: 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    #spinBtn:hover {
+        background: #d64570;
+        transform: scale(1.05);
+    }
+</style>
 </head>
 
 <body>
 
-<div class="game-container">
-    <h2>Spin the Wheel</h2>
+<h2>Spin the Wheel 🎡</h2>
 
-    <div class="wheel" id="wheel"></div>
-
-    <button id="spinBtn">SPIN</button>
-
-    <div id="result" class="hidden">
-        <h3>Your Number: <span id="numValue"></span></h3>
-        <img id="resultImage" src="" class="result-img" />
-        <button id="playAgainBtn">Play Again</button>
-    </div>
+<div class="wheel-container">
+    <img id="wheel" src="wheel.png" alt="Wheel">  <!-- your wheel image -->
 </div>
 
+<button id="spinBtn">Spin</button>
+
+<img id="resultImage" src="" alt="Result Image">
+
 <script>
-/* --------- Configuration --------- */
-const totalSectors = 6; // change if you use more/less sectors
+/* -------- SETTINGS -------- */
+const totalSectors = 6;
 const sectorAngle = 360 / totalSectors;
 
-/* Map number → image file (1..6) */
+/* Map number → image file (full screen) */
 const images = {
-  1: "pic1.jpg",
-    2: "pic2.jpg",
-    3: "pic3.jpg",
-    4: "pic4.jpg",
-    5: "pic5.jpg",
-    6: "pic9_car.jpg"
+    1: "img1.jpg",
+    2: "img2.jpg",
+    3: "img3.jpg",
+    4: "img4.jpg",
+    5: "img5.jpg",
+    6: "img6.jpg"
 };
 
-/* Elements */
-const spinBtn = document.getElementById("spinBtn");
 const wheel = document.getElementById("wheel");
-const resultDiv = document.getElementById("result");
-const numValue = document.getElementById("numValue");
+const spinBtn = document.getElementById("spinBtn");
 const resultImage = document.getElementById("resultImage");
-const playAgainBtn = document.getElementById("playAgainBtn");
 
-/* State */
-let currentRotation = 0; // degrees
+let currentRotation = 0;
 let spinning = false;
-const spinDurationMs = 3000; // match CSS transition duration
 
-/* Utility: disable/enable controls while spinning */
-function setControlsDisabled(disabled) {
-  spinBtn.disabled = disabled;
-  if (disabled) spinBtn.style.opacity = 0.6;
-  else spinBtn.style.opacity = 1;
-}
-
-/* Spin handler */
+/* ------------ SPIN LOGIC ------------ */
 spinBtn.addEventListener("click", () => {
-  if (spinning) return; // prevent double spins
-  spinning = true;
-  setControlsDisabled(true);
-  resultDiv.classList.add("hidden");
+    if (spinning) return;
 
-  // pick random sector 1..totalSectors
-  const randomNumber = Math.floor(Math.random() * totalSectors) + 1;
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtn.style.opacity = "0.6";
 
-  // choose how many full turns (for the dramatic effect)
-  const fullTurns = 5; // number of full 360° turns
+    const spinDurationMs = 3000;
 
-  // target offset: position the wheel so the center of the sector lands (adjust as needed)
-  const offsetForSector = (randomNumber - 1) * sectorAngle + sectorAngle / 2;
+    // random number 1..6
+    const randomNumber = Math.floor(Math.random() * totalSectors) + 1;
 
-  // absolute target rotation
-  const targetRotation = currentRotation + fullTurns * 360 + offsetForSector;
+    const fullTurns = 5;  
+    const targetOffset = (randomNumber - 1) * sectorAngle + sectorAngle / 2;
 
-  // apply rotation
-  wheel.style.transition = `transform ${spinDurationMs}ms cubic-bezier(.17,.67,.32,1)`; // easeOut feel
-  wheel.style.transform = `rotate(${targetRotation}deg)`;
+    const targetRotation = currentRotation + fullTurns * 360 + targetOffset;
 
-  // after spinDuration, show result and update currentRotation
-  setTimeout(() => {
-    currentRotation = targetRotation % 360; // keep in 0..359 range
-    numValue.textContent = randomNumber;
-    resultImage.src = images[randomNumber] || ""; // set image
-    resultDiv.classList.remove("hidden");
-    spinning = false;
-    setControlsDisabled(false);
-  }, spinDurationMs + 50); // small buffer
-});
+    wheel.style.transform = `rotate(${targetRotation}deg)`;
 
-/* Play again handler — reset UI so user can spin again */
-playAgainBtn.addEventListener("click", () => {
-  resultDiv.classList.add("hidden");
-  // keep the wheel at its currentRotation (no abrupt jump)
-  // If you want to visually reset to 0deg, do the following:
-  // wheel.style.transition = 'transform 800ms ease';
-  // wheel.style.transform = 'rotate(0deg)';
-  // currentRotation = 0; // remember to update state
+    setTimeout(() => {
+        currentRotation = targetRotation % 360;
 
-  // Allow another spin immediately
-  spinning = false;
-  setControlsDisabled(false);
+        // show result image
+        resultImage.style.display = "block";
+        resultImage.src = images[randomNumber];
 
-  // If you prefer Play Again to auto-spin, call spinBtn.click() here:
-  // spinBtn.click();
+        spinBtn.textContent = "Spin Again";
+        spinBtn.disabled = false;
+        spinBtn.style.opacity = "1";
+        spinning = false;
+
+    }, spinDurationMs + 50);
 });
 </script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
