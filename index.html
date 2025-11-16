@@ -91,7 +91,9 @@
         "step2aa": "pic7_india.jpeg",
         "step2ab": "pic7_india.jpeg",
         "step3a": "pic6_indore.jpeg",
-        "step3b": "pic6_indore.jpeg"
+        "step3b": "pic6_indore.jpeg",
+		"step4": "pic1.jpg",
+		"step4": "pic2.jpg"
     };
 
     /* -----------------------------
@@ -113,9 +115,17 @@
         step3: {
             question: "Do you remember something of the place where you are right now?",
             next: { 
-                a: "finalA", 
-                b: "finalB" 
+                a: "step4", 
+                b: "step5" 
             }
+        },
+		step4: {
+            question: "I know you love me and remember each and every moment. Hold me like this only...?",
+            
+        },
+		step5: {
+            question: "Itna gussa ho mujhse??",
+            
         },
         finalA: {
             message: "I know you love me and remember each and every moment. Hold me like this only..."
@@ -179,5 +189,6 @@
 
 </body>
 </html>
+
 
 
