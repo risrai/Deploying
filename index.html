@@ -66,9 +66,16 @@
     <p id="text">Hey Gunjan, I have a few questions for you… ❤️</p>
 
     <div id="question-area">
-        <p id="question"></p>
-        <button onclick="handleAnswer('a')" id="btnA">Offcourse</button>
+        <p id="question" style="
+    font-style: italic;
+    color: blue;
+    font-weight: 600;
+"></p>
+        <div style="display:flex">
+             <button onclick="handleAnswer('a')" id="btnA">Offcourse</button>
         <button onclick="handleAnswer('b')" id="btnB">Nahi mujhe kuch yaad nahi hai</button>
+        </div>
+       
         <br>
         <button class="back-btn" onclick="goBack()">⬅ Go Back</button>
     </div>
@@ -172,4 +179,5 @@
 
 </body>
 </html>
+
 
