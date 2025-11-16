@@ -1,76 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spin Wheel Game</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f7f7f7;
-        text-align: center;
-        overflow-x: hidden;
-    }
-
-    .wheel-container {
-        margin-top: 20px;
-    }
-
-    #wheel {
-        width: 260px;
-        height: 260px;
-        transition: transform 3s cubic-bezier(.17,.67,.32,1);
-    }
-
-    /* Fullscreen responsive result image */
-    #resultImage {
-        width: 100%;
-        height: auto;
-        max-height: 80vh;
-        object-fit: contain;
-        margin-top: 20px;
-        display: none;
-    }
-
-    #spinBtn {
-        margin-top: 20px;
-        padding: 12px 28px;
-        background: #e75480;
-        color: white;
-        border: none;
-        font-size: 18px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    #spinBtn:hover {
-        background: #d64570;
-        transform: scale(1.05);
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin to Reveal</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+    <style>
+        body {
+    margin: 0;
+    padding: 0;
+    background: #f8f8f8;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
 
-<body>
+.title {
+    font-size: 28px;
+    margin-top: 20px;
+    font-weight: bold;
+}
 
-<h2>Spin the Wheel 🎡</h2>
+.wheel-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
 
-<div class="wheel-container">
-    <img id="wheel" src="wheel.png" alt="Wheel">  <!-- your wheel image -->
-</div>
+.wheel {
+    width: 300px;
+    height: 300px;
+    transition: transform 4s ease-out;
+}
 
-<button id="spinBtn">Spin</button>
+.spin-btn {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+}
 
-<img id="resultImage" src="" alt="Result Image">
+.spin-btn:hover {
+    background: #ff3355;
+}
 
-<script>
-/* -------- SETTINGS -------- */
-const totalSectors = 15;
-const sectorAngle = 360 / totalSectors;
+.result-img {
+    width: 95%;
+    max-width: 700px;
+    margin-top: 20px;
+    display: none;
+    border-radius: 10px;
+}
 
-/* Map number → image file (full screen) */
+    </style>
+    <script>
+        const wheel = document.getElementById("wheel");
+const spinBtn = document.getElementById("spinButton");
+const resultImage = document.getElementById("resultImage");
+
+// Your EXACT image map
 const images = {
     1: "pic1.jpg",
     2: "pic2.jpg",
@@ -78,62 +71,64 @@ const images = {
     4: "pic4.jpg",
     5: "pic5.jpg",
     6: "pic8_lonavala.jpeg",
-     7: "pic10.jpg",
+    7: "pic10.jpg",
     8: "pic11.jpg",
-     9: "pic12.jpg",
-     10: "pic13.jpg",
+    9: "pic12.jpg",
+    10: "pic13.jpg",
     11: "pic14.jpg",
     12: "pic15.jpg",
-     13: "pic16.jpg",
-     14: "pic17.jpg",
-     15: "pic18.jpg",
+    13: "pic16.jpg",
+    14: "pic17.jpg",
+    15: "pic18.jpg"
 };
 
-const wheel = document.getElementById("wheel");
-const spinBtn = document.getElementById("spinBtn");
-const resultImage = document.getElementById("resultImage");
+// Wheel settings
+const totalSlices = 15;
+const sliceAngle = 360 / totalSlices;
 
+let visitedNumbers = new Set();
 let currentRotation = 0;
-let spinning = false;
 
-/* ------------ SPIN LOGIC ------------ */
+// Spin Function
 spinBtn.addEventListener("click", () => {
-    if (spinning) return;
+    let available = [...Array(totalSlices).keys()].map(x => x + 1).filter(n => !visitedNumbers.has(n));
 
-    spinning = true;
-    spinBtn.disabled = true;
-    spinBtn.style.opacity = "0.6";
+    if (available.length === 0) {
+        visitedNumbers.clear(); // reset when all used
+        available = [...Array(totalSlices).keys()].map(x => x + 1);
+    }
 
-    const spinDurationMs = 3000;
+    const selected = available[Math.floor(Math.random() * available.length)];
+    visitedNumbers.add(selected);
 
-    // random number 1..6
-    const randomNumber = Math.floor(Math.random() * totalSectors) + 1;
+    // Spin rotation
+    const targetRotation = (360 * 5) + ((selected - 1) * sliceAngle + sliceAngle / 2);
+    currentRotation += targetRotation;
 
-    const fullTurns = 16;  
-    const targetOffset = (randomNumber - 1) * sectorAngle + sectorAngle / 2;
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-    const targetRotation = currentRotation + fullTurns * 360 + targetOffset;
+    spinBtn.innerText = visitedNumbers.size === 1 ? "Spin Again" : "Spin Again";
 
-    wheel.style.transform = `rotate(${targetRotation}deg)`;
-
+    // Show the image after spin completes
     setTimeout(() => {
-        currentRotation = targetRotation % 360;
-
-        // show result image
+        resultImage.src = images[selected];
         resultImage.style.display = "block";
-        resultImage.src = images[randomNumber];
-
-        spinBtn.textContent = "Spin Again";
-        spinBtn.disabled = false;
-        spinBtn.style.opacity = "1";
-        spinning = false;
-
-    }, spinDurationMs + 50);
+    }, 4000); // matches wheel spin duration
 });
-</script>
 
+    </script>
+<body>
+
+    <h1 class="title">Spin the Wheel ❤️</h1>
+
+    <div class="wheel-container">
+        <img id="wheel" src="wheel.png" class="wheel" alt="Wheel">
+    </div>
+
+    <button id="spinButton" class="spin-btn">Spin</button>
+
+    <img id="resultImage" class="result-img">
+
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
