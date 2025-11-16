@@ -67,7 +67,7 @@
 
 <script>
 /* -------- SETTINGS -------- */
-const totalSectors = 6;
+const totalSectors = 15;
 const sectorAngle = 360 / totalSectors;
 
 /* Map number → image file (full screen) */
@@ -77,7 +77,16 @@ const images = {
     3: "pic3.jpg",
     4: "pic4.jpg",
     5: "pic5.jpg",
-    6: "pic9_car.jpg"
+    6: "pic8_lonavala.jpeg",
+     7: "pic10.jpg",
+    8: "pic11.jpg",
+     9: "pic12.jpg",
+     10: "pic13.jpg",
+    11: "pic14.jpg",
+    12: "pic15.jpg",
+     13: "pic16.jpg",
+     14: "pic17.jpg",
+     15: "pic18.jpg",
 };
 
 const wheel = document.getElementById("wheel");
@@ -100,7 +109,7 @@ spinBtn.addEventListener("click", () => {
     // random number 1..6
     const randomNumber = Math.floor(Math.random() * totalSectors) + 1;
 
-    const fullTurns = 5;  
+    const fullTurns = 16;  
     const targetOffset = (randomNumber - 1) * sectorAngle + sectorAngle / 2;
 
     const targetRotation = currentRotation + fullTurns * 360 + targetOffset;
@@ -125,5 +134,6 @@ spinBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
