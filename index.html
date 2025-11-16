@@ -56,6 +56,21 @@
 </div>
 
 <script>
+/* --------- Configuration --------- */
+const totalSectors = 6; // change if you use more/less sectors
+const sectorAngle = 360 / totalSectors;
+
+/* Map number → image file (1..6) */
+const images = {
+  1: "img1.png",
+  2: "img2.png",
+  3: "img3.png",
+  4: "img4.png",
+  5: "img5.png",
+  6: "img6.png"
+};
+
+/* Elements */
 const spinBtn = document.getElementById("spinBtn");
 const wheel = document.getElementById("wheel");
 const resultDiv = document.getElementById("result");
@@ -63,37 +78,74 @@ const numValue = document.getElementById("numValue");
 const resultImage = document.getElementById("resultImage");
 const playAgainBtn = document.getElementById("playAgainBtn");
 
-const images = {
-    1: "pic1.jpg",
-    2: "pic2.jpg",
-    3: "pic3.jpg",
-    4: "pic4.jpg",
-    5: "pic5.jpg",
-    6: "pic9_car.jpg"
-};
+/* State */
+let currentRotation = 0; // degrees
+let spinning = false;
+const spinDurationMs = 3000; // match CSS transition duration
 
+/* Utility: disable/enable controls while spinning */
+function setControlsDisabled(disabled) {
+  spinBtn.disabled = disabled;
+  if (disabled) spinBtn.style.opacity = 0.6;
+  else spinBtn.style.opacity = 1;
+}
+
+/* Spin handler */
 spinBtn.addEventListener("click", () => {
-    const randomNumber = Math.floor(Math.random() * 6) + 1;
+  if (spinning) return; // prevent double spins
+  spinning = true;
+  setControlsDisabled(true);
+  resultDiv.classList.add("hidden");
 
-    const rotation = 360 * 5 + (randomNumber * 60); // 6 sections = 60deg each
+  // pick random sector 1..totalSectors
+  const randomNumber = Math.floor(Math.random() * totalSectors) + 1;
 
-    wheel.style.transform = `rotate(${rotation}deg)`;
+  // choose how many full turns (for the dramatic effect)
+  const fullTurns = 5; // number of full 360° turns
 
-    setTimeout(() => {
-        numValue.textContent = randomNumber;
-        resultImage.src = images[randomNumber];
-        resultDiv.classList.remove("hidden");
-    }, 3000); // matches CSS transition
+  // target offset: position the wheel so the center of the sector lands (adjust as needed)
+  const offsetForSector = (randomNumber - 1) * sectorAngle + sectorAngle / 2;
+
+  // absolute target rotation
+  const targetRotation = currentRotation + fullTurns * 360 + offsetForSector;
+
+  // apply rotation
+  wheel.style.transition = `transform ${spinDurationMs}ms cubic-bezier(.17,.67,.32,1)`; // easeOut feel
+  wheel.style.transform = `rotate(${targetRotation}deg)`;
+
+  // after spinDuration, show result and update currentRotation
+  setTimeout(() => {
+    currentRotation = targetRotation % 360; // keep in 0..359 range
+    numValue.textContent = randomNumber;
+    resultImage.src = images[randomNumber] || ""; // set image
+    resultDiv.classList.remove("hidden");
+    spinning = false;
+    setControlsDisabled(false);
+  }, spinDurationMs + 50); // small buffer
 });
 
+/* Play again handler — reset UI so user can spin again */
 playAgainBtn.addEventListener("click", () => {
-    resultDiv.classList.add("hidden");
-    wheel.style.transform = "rotate(0deg)";
+  resultDiv.classList.add("hidden");
+  // keep the wheel at its currentRotation (no abrupt jump)
+  // If you want to visually reset to 0deg, do the following:
+  // wheel.style.transition = 'transform 800ms ease';
+  // wheel.style.transform = 'rotate(0deg)';
+  // currentRotation = 0; // remember to update state
+
+  // Allow another spin immediately
+  spinning = false;
+  setControlsDisabled(false);
+
+  // If you prefer Play Again to auto-spin, call spinBtn.click() here:
+  // spinBtn.click();
 });
 </script>
 
+
 </body>
 </html>
+
 
 
 
