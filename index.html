@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spin to Reveal</title>
-    <link rel="stylesheet" href="styles.css">
+    
 </head>
     <style>
         body {
@@ -58,7 +58,19 @@
 }
 
     </style>
-    <script>
+   
+<body>
+
+    <h1 class="title">Spin the Wheel ❤️</h1>
+
+    <div class="wheel-container">
+        <img id="wheel" src="wheel.png" class="wheel" alt="Wheel">
+    </div>
+
+    <button id="spinButton" class="spin-btn">Spin</button>
+
+    <img id="resultImage" class="result-img">
+ <script>
         const wheel = document.getElementById("wheel");
 const spinBtn = document.getElementById("spinButton");
 const resultImage = document.getElementById("resultImage");
@@ -117,20 +129,9 @@ spinBtn.addEventListener("click", () => {
 });
 
     </script>
-<body>
-
-    <h1 class="title">Spin the Wheel ❤️</h1>
-
-    <div class="wheel-container">
-        <img id="wheel" src="wheel.png" class="wheel" alt="Wheel">
-    </div>
-
-    <button id="spinButton" class="spin-btn">Spin</button>
-
-    <img id="resultImage" class="result-img">
-
-    <script src="script.js"></script>
+  
 </body>
 </html>
+
 
 
