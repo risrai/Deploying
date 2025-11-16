@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>For You</title>
+
     <style>
         body {
             margin: 0;
@@ -17,7 +18,9 @@
             background-position: center;
             transition: background-image 0.8s ease-in-out;
             color: #333;
+            background-image: url('pic1.jpg'); /* DEFAULT IMAGE */
         }
+
         .card {
             background: rgba(255,255,255,0.85);
             padding: 30px 40px;
@@ -25,82 +28,147 @@
             text-align: center;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             max-width: 400px;
-            animation: fadeIn 1.2s ease;
+            animation: fadeIn 1s ease;
         }
-        h1 {
-            margin-top: 0;
-            font-size: 2rem;
-            color: #e75480;
-        }
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
+
+        h1 { color: #e75480; }
+
         button {
-            margin: 10px;
             padding: 10px 20px;
             border: none;
             border-radius: 10px;
             background: #e75480;
             color: white;
             cursor: pointer;
+            margin: 10px;
             font-size: 1rem;
             transition: 0.3s;
         }
-        button:hover {
-            transform: scale(1.05);
-            background: #d64570;
+
+        button:hover { transform: scale(1.06); }
+
+        .back-btn {
+            background: gray;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
+
 <body>
-    <div class="card" id="card">
-        <h1>Let’s Play a Little Game</h1>
-        <p id="text">Hey Gunjan,I have a few questions for you… answer them one by one ❤️</p>
 
-        <div id="question-area">
-            <p id="question">1. Do you remember the first time we met in Lonavala ?</p>
-            <button onclick="nextQuestion(1)">Yes, of course</button>
-            <button onclick="nextQuestion(2)">Hmm… maybe 😄</button>
-        </div>
+<div class="card">
+    <h1>Let’s Play a Little Game</h1>
+
+    <p id="text">Hey Gunjan, I have a few questions for you… ❤️</p>
+
+    <div id="question-area">
+        <p id="question"></p>
+        <button onclick="handleAnswer('a')" id="btnA">Offcourse</button>
+        <button onclick="handleAnswer('b')" id="btnB">Nahi mujhe kuch yaad nahi hai</button>
+        <br>
+        <button class="back-btn" onclick="goBack()">⬅ Go Back</button>
     </div>
+</div>
 
-    <script>
-        const questions = [
-            "1. Do you remember the first time we met in Lonavala?",
-            "2. Did you smile a little when you saw this page?",
-            "3. Do you know you make my day better without even trying?",
-            "4. Will you forgive me for being silly sometimes?",
-            "5. Can I tell you something important?"
-        ];
+<script>
+    /* -----------------------------------
+       CONFIG: Map answerId → background image
+    --------------------------------------*/
+    const imageMap = {
+        "q1a": "pic8_lonavala.jpeg",
+        "q1b": "pic8_lonavala.jpeg",
+        "q2a": "pic7_india.jpeg",
+        "q2b": "pic7_india.jpeg",
+        "q3a": "pic6_indore.jpeg",
+        "q3b": "pic6_indore.jpeg"
+    };
 
-        const photos = [
-            "pic1.jpg",
-            "pic2.jpg",
-            "pic3.jpg",
-            "pic4.jpg",
-            "pic5.jpg" // optional, remove if not needed
-        ];
-
-        const finalMessage = `I'm really sorry. I care about you more than you think,
-and I never want to upset you. Thank you for being you ❤️`;
-
-        function nextQuestion(index) {
-            document.body.style.backgroundImage = `url('${photos[index]}')`;
-            const questionEl = document.getElementById('question');
-            const textEl = document.getElementById('text');
-
-            if (index < questions.length - 1) {
-                questionEl.textContent = questions[index + 1];
-            } else {
-                document.getElementById('question-area').innerHTML = `<p style="font-size:1.2rem; white-space:pre-line;">${finalMessage}</p>`;
-                textEl.textContent = "Just one last thing…";
+    /* -----------------------------
+       QUESTION FLOW LOGIC
+    ------------------------------*/
+    const flow = {
+        step1: {
+            question: "Do you remember the first time we met in Lonavala?",
+            next: { a: "step2a", b: "step2b" }
+        },
+        step2a: {
+            question: "I knew you have a great memory! Do you remember the time we spent at India Gate?",
+            next: { a: "step3", b: "step3" }
+        },
+        step2b: {
+            question: "Ohh ho, bari weak memory hai! Chalo, do you remember the time we spent at India Gate?",
+            next: { a: "step3", b: "step3" }
+        },
+        step3: {
+            question: "Do you remember something of the place where you are right now?",
+            next: { 
+                a: "finalA", 
+                b: "finalB" 
             }
+        },
+        finalA: {
+            message: "I know you love me and remember each and every moment. Hold me like this only..."
+        },
+        finalB: {
+            message: "Itna gussa ho mujhse?"
         }
-    </script>
+    };
+
+    let history = [];
+    let currentStep = "step1";
+
+    document.getElementById("question").textContent = flow[currentStep].question;
+
+    /* -----------------------------
+       HANDLE ANSWER CLICK
+    ------------------------------*/
+    function handleAnswer(ans) {
+        history.push(currentStep);
+
+        // Change background
+        document.body.style.backgroundImage =
+            `url('${imageMap[currentStep + ans] || "pic9__car.jpeg"}')`;
+
+        const nextStep = flow[currentStep].next[ans];
+
+        // If final page
+        if (nextStep === "finalA" || nextStep === "finalB") {
+            document.getElementById("question-area").innerHTML = `
+                <p style="font-size:1.3rem; white-space:pre-line;">
+                    ${flow[nextStep].message}
+                </p>
+                <button class="back-btn" onclick="goBack()">⬅ Go Back</button>
+            `;
+            currentStep = nextStep;
+            return;
+        }
+
+        // Normal next step
+        currentStep = nextStep;
+        document.getElementById("question").textContent = flow[currentStep].question;
+    }
+
+    /* -----------------------------
+       GO BACK FUNCTION
+    ------------------------------*/
+    function goBack() {
+        if (history.length === 0) return;
+
+        currentStep = history.pop();
+
+        document.getElementById("question-area").innerHTML = `
+            <p id="question">${flow[currentStep].question}</p>
+            <button onclick="handleAnswer('a')" id="btnA">Offcourse</button>
+            <button onclick="handleAnswer('b')" id="btnB">Nahi mujhe kuch yaad nahi hai</button>
+            <br>
+            <button class="back-btn" onclick="goBack()">⬅ Go Back</button>
+        `;
+    }
+</script>
+
 </body>
 </html>
